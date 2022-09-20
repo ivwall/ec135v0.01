@@ -12,6 +12,8 @@ import static io.crtp.ec135.app.MessageUtils.getMessage;
 import org.apache.commons.text.WordUtils;
 
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
+import io.crtp.ec135.app.db.MariaDB;
+import io.crtp.ec135.app.btc.Addresses;
 
 public class App {
     public static void main(String[] args) {
@@ -23,5 +25,9 @@ public class App {
         BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
         bitcoinRPCs.getBlockCount();
 
+        MariaDB db = new MariaDB();
+
+        Addresses address = new Addresses(db, bitcoinRPCs);
+        address.scan01();
     }
 }
