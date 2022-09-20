@@ -11,11 +11,17 @@ import static io.crtp.ec135.app.MessageUtils.getMessage;
 
 import org.apache.commons.text.WordUtils;
 
+import io.crtp.ec135.app.rpc.BitcoinRPCs;
+
 public class App {
     public static void main(String[] args) {
         LinkedList tokens;
         tokens = split(getMessage());
         String result = join(tokens);
         System.out.println(WordUtils.capitalize(result));
+
+        BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
+        bitcoinRPCs.getBlockCount();
+
     }
 }

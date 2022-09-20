@@ -9,6 +9,14 @@ plugins {
 dependencies {
     implementation 'org.apache.commons:commons-text'
     implementation project(':utilities')
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'org.apache.httpcomponents:httpcore:4.4.15'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'org.bouncycastle:bcpg-jdk18on:1.71.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.13.4'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
+    implementation 'org.bitcoinj:bitcoinj-core:0.16.1'
+    implementation 'org.bitcoinj:bitcoinj-tools:0.14.7'
 }
 
 application {
