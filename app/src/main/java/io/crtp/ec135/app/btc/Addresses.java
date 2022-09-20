@@ -25,7 +25,6 @@ import io.crtp.ec135.app.rpc.BitcoinRPCs;
 /***
  * 
  */
-
 public class Addresses {
 
     //BitcoinRPCs bitcoinRPCs = null;
@@ -45,7 +44,7 @@ public class Addresses {
     
     public void scan01() {
         long last_time = System.nanoTime();
-        for (int x=0; x<10; x++){
+        for (int x=0; x<100000; x++){
             //for (int x=749148; x<749151; x++){
             //for (int x=0; x<749874; x++){
                 try {
@@ -111,6 +110,7 @@ public class Addresses {
                         addrStr = addrString(addr);
                         //mySqlIDS.putAddrData(addrStr,"null");
                         r2.append(addrStr);
+                        db.write(addrStr);
 
                     }
 
@@ -122,6 +122,10 @@ public class Addresses {
                     // see line 331
                     //r2.append("  "+(String)script.get("asm"));
                     String x = asmWork((String)script.get("asm"));
+
+                    db.write(x);
+                    //db.write(addrString(x));
+
                     r2.append("  "+addrString(x));
                     r2.append(" "+valueStr);
 
@@ -284,7 +288,4 @@ public class Addresses {
         return data;
     }
     
-
-
-
 }

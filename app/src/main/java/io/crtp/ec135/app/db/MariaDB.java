@@ -40,11 +40,12 @@ public class MariaDB implements IDataStore {
 
         try {
             
-            System.out.println("putAddrData");
+            System.out.println("db.write("+addr+")");
             insertAddr.setString(1,addr);
             insertAddr.executeUpdate();
 
         } catch(Exception ex){
+            System.out.println(addr);
             System.out.println(ex.toString());
         }
 

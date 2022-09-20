@@ -1,0 +1,77 @@
+
+
+
+
+
+index    |   address
+
+one-to-many
+
+index       |   block     |   trx   |   utxo
+
+create table wallet ( aid int not null auto_increment primary key, addr char(80) not null unique );
+
+bc1qywmcstl539vy0l8xg6wuuzek9esvzdt7gte2c5h9srkh7p70sndqux7wkn
+123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
+         1         2         3         4         5         6         7         8
+
+mysql> create table wallet ( aid int not null auto_increment primary key, addr char(80) not null unique );
+
+mysql> describe table wallet;
++----+-------------+--------+------------+-------+---------------+------+---------+------+------+----------+-------------+
+| id | select_type | table  | partitions | type  | possible_keys | key  | key_len | ref  | rows | filtered | Extra       |
++----+-------------+--------+------------+-------+---------------+------+---------+------+------+----------+-------------+
+|  1 | SIMPLE      | wallet | NULL       | index | NULL          | addr | 280     | NULL |    1 |   100.00 | Using index |
++----+-------------+--------+------------+-------+---------------+------+---------+------+------+----------+-------------+
+1 row in set, 1 warning (0.04 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_blockdb |
++-------------------+
+| wallet            |
++-------------------+
+1 row in set (0.00 sec)
+
+mysql> describe wallet;
++-------+----------+------+-----+---------+----------------+
+| Field | Type     | Null | Key | Default | Extra          |
++-------+----------+------+-----+---------+----------------+
+| id    | int      | NO   | PRI | NULL    | auto_increment |
+| addr  | char(70) | NO   | UNI | NULL    |                |
++-------+----------+------+-----+---------+----------------+
+2 rows in set (0.03 sec)
+
+mysql> insert into wallet(addr) values('bc1qywmcstl539vy0l8xg6wuuzek9esvzdt7gte2c5h9srkh7p70sndqux7wkn');
+Query OK, 1 row affected (0.16 sec)
+
+mysql> select * from wallet;
++----+----------------------------------------------------------------+
+| id | addr                                                           |
++----+----------------------------------------------------------------+
+|  1 | bc1qywmcstl539vy0l8xg6wuuzek9esvzdt7gte2c5h9srkh7p70sndqux7wkn |
++----+----------------------------------------------------------------+
+1 row in set (0.00 sec)
+
+   aid  |  block   |   trxn   |
+
+//https://www.digitalocean.com/community/tutorials/how-to-install-mysql-on-ubuntu-18-04
+
+//https://www.a2hosting.com/kb/developer-corner/mysql/restricting-mysql-port-access
+//https://phoenixnap.com/kb/mysql-remote-connection
+# sudo iptables -A INPUT -p tcp --dport 3306 -j ACCEPT
+
+//https://www.digitalocean.com/community/tutorials/how-to-create-a-new-user-and-grant-permissions-in-mysql
+> create database blockdb;
+> use blockdb;
+> create table wallet ( aid int not null auto_increment primary key, addr char(80) not null unique );
+> grant all privileges on blockdb.* to 'rsk'@'%';
+
+
+
+$ mvn install:install-file -Dfile=mysql-connector-java-8.0.30.jar -DgroupId=mysql -DartifactId=mysql-connector-java -Dversion=8.0.30 -Dpackaging=jar
+
+// the following command creates a directory, target/dependencies
+// it includes the mysql file, mysql-connector-java-8.0.30.jar
+// how to get it in the class path
+$ mvn dependency:copy-dependencies
