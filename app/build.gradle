@@ -17,6 +17,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
     implementation 'org.bitcoinj:bitcoinj-core:0.16.1'
     implementation 'org.bitcoinj:bitcoinj-tools:0.14.7'
+    implementation "mysql:mysql-connector-java:8.0.26"
 }
 
 application {
@@ -37,6 +38,10 @@ task fatJar(type: Jar) {
     dependsOn configurations.runtimeClasspath
     from {
         configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    } {
+        exclude "META-INF/*.SF"
+        exclude "META-INF/*.DSA"
+        exclude "META-INF/*.RSA"
     }
     with jar
 }
