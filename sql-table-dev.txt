@@ -75,3 +75,11 @@ $ mvn install:install-file -Dfile=mysql-connector-java-8.0.30.jar -DgroupId=mysq
 // it includes the mysql file, mysql-connector-java-8.0.30.jar
 // how to get it in the class path
 $ mvn dependency:copy-dependencies
+
+
+
+run characteristics
+150ms delay between blocks led to 139894 address written.
+500ms delay leads to what ..
+
+tecmint.com/mytop-mysql-mariadb-database-performance-monitoring-in-linux

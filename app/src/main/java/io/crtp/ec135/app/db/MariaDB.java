@@ -22,33 +22,39 @@ public class MariaDB implements IDataStore {
         String url = dburl +"user="+user+"&password="+pw;
 
         try {
-
-            System.out.println(url);
+            //System.out.println(url);
             conn = DriverManager.getConnection(url);
             insertAddr = conn.prepareStatement(insertAddrSql);
-
-            write("abc123xyz543");
-
         } catch (Exception ex){
             System.out.println(" >> "+ex.toString());
         }
 
     }
-    
 
     public void write(String addr) {
-
         try {
-            
-            System.out.println("db.write("+addr+")");
             insertAddr.setString(1,addr);
             insertAddr.executeUpdate();
-
         } catch(Exception ex){
             System.out.println(addr);
             System.out.println(ex.toString());
         }
+    }
 
+    public boolean insert(String addr) {
+        boolean result = true;
+        try {
+            insertAddr.setString(1,addr);
+            insertAddr.executeUpdate();
+        } catch(Exception ex){
+            if (ex.toString().contains("Duplicate")) {
+                // TODO: ... 
+            } else {
+                System.out.println(ex.toString());
+            }
+            result = false;
+        }
+        return result;
     }
 
 }

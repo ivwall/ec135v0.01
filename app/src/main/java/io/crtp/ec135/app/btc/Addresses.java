@@ -27,30 +27,27 @@ import io.crtp.ec135.app.rpc.BitcoinRPCs;
  */
 public class Addresses {
 
-    //BitcoinRPCs bitcoinRPCs = null;
     MariaDB db = null;
-
-    BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
-
+    //BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
+    BitcoinRPCs bitcoinRPCs = null;
 
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
 
     public Addresses(MariaDB mdb, BitcoinRPCs rpc) {
-        //bitcoinRPCs = rpc;
         db = mdb;
+        bitcoinRPCs = rpc;
     }
     
     public void scan01() {
         long last_time = System.nanoTime();
-        for (int x=0; x<100000; x++){
+        for (int x=0; x<250000; x++){
             //for (int x=749148; x<749151; x++){
             //for (int x=0; x<749874; x++){
                 try {
-                    System.out.println(x);
                     parseBlockXTrxs(x);
-                    Thread.sleep(125);
+                    Thread.sleep(75);
                 } catch (Exception ex) {
                     System.out.println(ex.toString());
                 }
@@ -66,10 +63,8 @@ public class Addresses {
         //123456789 1234567890123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
         //         1         2         3         4         5         6         7         8         8         0
         //  749151, 2342, bc1qwedezsjqyx5cl56dgzajtpawwste50gl05ty0t94zw38mp9zs64s7a5k8k, 1.473742370000
+
         StringBuffer r2 = new StringBuffer();
-        System.out.println("parseBlockXTrxs");
-        String rx = bitcoinRPCs.getBlockHash(blockN);
-        System.out.println(rx);
         JSONObject block = bitcoinRPCs.getBlock(bitcoinRPCs.getBlockHash(blockN),2);
 
         Long mediantime = (Long)((JSONObject)block.get("result")).get("mediantime");
@@ -103,43 +98,60 @@ public class Addresses {
                 String valueStr = String.format("%.12f",value); 
 
                 if (addrs != null) {
+
                     int addrCnt = addrs.size();
                     for (int k=0; k<addrCnt; k++) {
+
                         String addr = (String)addrs.get(k);
 
+                        if (addr.contains(",")) {
+                            addr = addr.replace(',',' ');
+                            addr.trim();
+                        }
+
+                        addr = db_instert_addr(addr);
+
                         addrStr = addrString(addr);
-                        //mySqlIDS.putAddrData(addrStr,"null");
+
                         r2.append(addrStr);
-                        db.write(addrStr);
 
                     }
-
-                    //String valueStr = String.format("%.12f",value); 
                     r2.append(" "+valueStr);
 
                 } else if (addrs == null) {
 
                     // see line 331
-                    //r2.append("  "+(String)script.get("asm"));
-                    String x = asmWork((String)script.get("asm"));
+                    String adr = asmWork((String)script.get("asm"));
+                    adr = db_instert_addr(adr);
 
-                    db.write(x);
-                    //db.write(addrString(x));
-
-                    r2.append("  "+addrString(x));
+                    r2.append("  "+addrString(adr));
                     r2.append(" "+valueStr);
 
                 }
+
                 r2.append(dateStr);
                 System.out.println(r2.toString());
                 r2 = new StringBuffer();
                 r2.append("         ");// block field
                 r2.append("      "); // trx field
                 dateStr = "";
+
             }
+
             r2 = new StringBuffer();
             r2.append("         ");
+
         }
+    }
+
+
+    public String db_instert_addr(String a){
+        if (db.insert(a)) {
+            a.concat("-n");
+        } else {
+            a.concat("-d");
+        }
+        return a;
     }
 
     public String blockNumString(int blk) {
@@ -212,17 +224,17 @@ public class Addresses {
     public String asmWork(String asm){
         String result = "not processed";
         try {
-
             String[] splited = asm.split(" ");
 
             if ( splited[1].contains("OP_CHECKSIG") ) {
                 result = addressFromPubKey(splited[0]);
             } else {
+                System.out.println("asm: "+asm);
                 result = "asm: "+asm;
             }
 
         } catch ( Exception ex ){
-            result = asm;
+            result = "not processed";
         }
         return result;
     }

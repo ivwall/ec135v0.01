@@ -23,7 +23,7 @@ public class App {
         System.out.println(WordUtils.capitalize(result));
 
         BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
-        bitcoinRPCs.getBlockCount();
+        //bitcoinRPCs.getBlockCount();
 
         MariaDB db = new MariaDB();
 

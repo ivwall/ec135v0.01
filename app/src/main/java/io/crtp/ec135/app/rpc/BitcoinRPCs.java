@@ -20,12 +20,16 @@ import org.json.simple.parser.JSONParser;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import io.crtp.ec135.app.utilities.EC135Properties;
+
 public class BitcoinRPCs implements IBitcoinRPC {
 
 	private String nodeIP  = "10.10.89.92";
 	private String user    = "Anch0rCh@1n";
 	private String pw      = "abc1234";
 	private String nodeURL = "http://localhost:8332";
+
+    EC135Properties ec135props = new EC135Properties();
 
     public BitcoinRPCs() {
     }
