@@ -1,6 +1,8 @@
 
 
+https://www.digitalocean.com/community/tutorials/how-to-install-mariadb-on-ubuntu-22-04
 
+sudo apt install mariadb-server
 
 
 index    |   address
@@ -83,3 +85,150 @@ run characteristics
 500ms delay leads to what ..
 
 tecmint.com/mytop-mysql-mariadb-database-performance-monitoring-in-linux
+
+
+
+github.com/OpenHFT/Java-Thread-Affinity
+javai.net/post/202204/java-thread-affinity
+
+
+mariadb memory
+
+mariadb> show status like 'thead%';
+
+
+https://michael.bouvy.net/post/understanding-mysql-innodb-buffer-pool-size
+select count(*) from information_schema.innodb_buffer_page;
++----------+
+| count(*) |
++----------+
+| 8112     |
++----------+
+
+
+select
+page_type as Page_Type,
+sum(data_size)/1024/1024 as Size_in_MB
+from information_schema.innodb_buffer_page
+group by page_type
+order by Size_in_MB desc;
+
++-------------------+--------------+
+| Page_Type         | Size_in_MB   |
++-------------------+--------------+
+| INDEX             | 109.057      |
+| UNKNOWN           | 0.00000000   |
+| TRX_SYSTEM        | 0.00000000   |
+| SYSTEM            | 0.00000000   |
+| FILE_SPACE_HEADER | 0.00000000   |
+| IBUF_BITMAP       | 0.00000000   |
+| EXTENT_DESCRIPTOR | 0.00000000   |
+| ALLOCATED         | 0.00000000   |
+| INODE             | 0.00000000   |
+| BLOB              | 0.00000000   |
+| UNDO_LOG          | 0.00000000   |
+| IBUF_FREE_LIST    | 0.00000000   |
+| IBUF_INDEX        | 0.00000000   |
++-------------------+--------------+
+
+https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool-resize.html
+
+$> mysqld --innodb-buffer-pool-size=8G --innodb-buffer-pool-instances=16
+
+
+
+https://mariadb.com/kb/en/mariadb-memory-allocation/
+If only using InnoDB, set innodb_buffer_pool_size to 70% of available RAM. 
+(Plus key_buffer_size = 10M, small, but not zero.)
+
+
+
+
+mariadb performance
+https://stackoverflow.com/questions/45568020/how-to-fix-high-memory-usage-of-mariadb
+
+my.cnf
+[client]
+port            = 3306
+socket          = /var/run/mysqld/mysqld.sock
+
+# Here is entries for some specific programs
+# The following values assume you have at least 32M ram
+
+# This was formally known as [safe_mysqld]. Both versions are currently parsed.
+[mysqld_safe]
+socket          = /var/run/mysqld/mysqld.sock
+nice            = 0
+
+[mysqld]
+#performance_schema=ON
+tmp_table_size=16M
+max_heap_table_size=16M
+skip-log-bin
+#table_open_cache                =16384
+#table_definition_cache          =16384
+
+#
+# * Basic Settings
+#
+user            = mysql
+pid-file        = /var/run/mysqld/mysqld.pid
+socket          = /var/run/mysqld/mysqld.sock
+port            = 3306
+basedir         = /usr
+datadir         = /var/lib/mysql
+tmpdir          = /tmp
+lc_messages_dir = /usr/share/mysql
+lc_messages     = en_US
+skip-external-locking
+
+
+#bind-address           = 127.0.0.1
+#skip-networking
+
+
+# SAFETY #
+max_allowed_packet= 16M
+max-connect-errors = 1000000
+skip-name-resolve
+#sql-mode = STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_AUTO_VALUE_ON_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE,ONLY_FULL_GROUP_BY
+
+# CACHES AND LIMITS #
+tmp-table-size                 = 32M
+max-heap-table-size            = 32M
+query-cache-type               = 0
+query-cache-size               = 0
+max-connections                = 500
+thread-cache-size              = 50
+open-files-limit               = 65535
+table-definition-cache         = 1024
+table-open-cache               = 2048
+
+
+# LOGGING #
+log_warnings            = 2
+slow_query_log          =1
+log-output              = TABLE
+long_query_time = 5
+log_slow_verbosity      = query_plan
+log-error               =/var/log/mysql/system_error.err
+
+
+# INNODB #
+innodb-flush-method            = O_DIRECT
+innodb-log-files-in-group      = 2
+innodb-log-file-size           = 128M
+innodb-flush-log-at-trx-commit = 1
+innodb-file-per-table          = 1
+innodb-buffer-pool-size        = 1720M
+
+[mysqldump]
+quick
+quote-names
+max_allowed_packet      = 16M
+
+[mysql]
+#no-auto-rehash # faster start of mysql but no tab completion
+
+[isamchk]
+key_buffer              = 16M

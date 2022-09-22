@@ -47,7 +47,7 @@ public class Addresses {
             //for (int x=0; x<749874; x++){
                 try {
                     parseBlockXTrxs(x);
-                    Thread.sleep(75);
+                    //Thread.sleep(75);
                 } catch (Exception ex) {
                     System.out.println(ex.toString());
                 }
@@ -110,9 +110,7 @@ public class Addresses {
                         }
 
                         addr = db_instert_addr(addr);
-
                         addrStr = addrString(addr);
-
                         r2.append(addrStr);
 
                     }
@@ -122,8 +120,12 @@ public class Addresses {
 
                     // see line 331
                     String adr = asmWork((String)script.get("asm"));
-                    adr = db_instert_addr(adr);
-
+                    if (adr.contains("asm:") || adr.contains("not processed")) { 
+                        r2.append("  "+addrString(adr));                        
+                    } else {
+                        adr = db_instert_addr(adr);                        
+                        r2.append("  "+addrString(adr));
+                    }
                     r2.append("  "+addrString(adr));
                     r2.append(" "+valueStr);
 
