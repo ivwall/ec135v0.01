@@ -30,6 +30,7 @@ public class Addresses {
     MariaDB db = null;
     //BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
     BitcoinRPCs bitcoinRPCs = null;
+    private int checkNumberOfAddresses = 10000;
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -45,17 +46,26 @@ public class Addresses {
         for (int x=0; x<250000; x++){
             //for (int x=749148; x<749151; x++){
             //for (int x=0; x<749874; x++){
-                try {
-                    parseBlockXTrxs(x);
-                    //Thread.sleep(75);
-                } catch (Exception ex) {
-                    System.out.println(ex.toString());
+            try {
+
+                parseBlockXTrxs(x);
+                
+                if (x == checkNumberOfAddresses) {
+                    System.out.println("number of addresses: "+db.getAddressCount());
+                    checkNumberOfAddresses = checkNumberOfAddresses + checkNumberOfAddresses;
                 }
+
+            } catch (Exception ex) {
+                System.out.println(ex.toString());
             }
-            long time = System.nanoTime();
+        }
+        long time = System.nanoTime();
         System.out.println("run time, milis "+(int)((time - last_time) / 1000000));
     }
 
+
+    long rpcStart = 0;
+    long rpcFinish = 0;
     /***
      * 
      */
@@ -65,7 +75,11 @@ public class Addresses {
         //  749151, 2342, bc1qwedezsjqyx5cl56dgzajtpawwste50gl05ty0t94zw38mp9zs64s7a5k8k, 1.473742370000
 
         StringBuffer r2 = new StringBuffer();
+
+        rpcStart = System.nanoTime();
         JSONObject block = bitcoinRPCs.getBlock(bitcoinRPCs.getBlockHash(blockN),2);
+        rpcFinish = System.nanoTime();
+        System.out.println("rpc call durration "+(rpcFinish-rpcStart));
 
         Long mediantime = (Long)((JSONObject)block.get("result")).get("mediantime");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -109,7 +123,8 @@ public class Addresses {
                             addr.trim();
                         }
 
-                        addr = db_instert_addr(addr);
+                        //addr = db_instert_addr(addr);
+                        addr = dbWrite(addr);
                         addrStr = addrString(addr);
                         r2.append(addrStr);
 
@@ -121,9 +136,18 @@ public class Addresses {
                     // see line 331
                     String adr = asmWork((String)script.get("asm"));
                     if (adr.contains("asm:") || adr.contains("not processed")) { 
+
                         r2.append("  "+addrString(adr));                        
+
+                        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+                        // Remove and unCOMMENT AAAAA
+                        r2.append(dateStr);
+                        System.out.println(r2.toString());
+                        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
                     } else {
-                        adr = db_instert_addr(adr);                        
+                        //adr = db_instert_addr(adr);
+                        adr = dbWrite(adr);                        
                         r2.append("  "+addrString(adr));
                     }
                     r2.append("  "+addrString(adr));
@@ -131,8 +155,10 @@ public class Addresses {
 
                 }
 
-                r2.append(dateStr);
-                System.out.println(r2.toString());
+                // AAAAAAAAAAAAAAAAAA
+                //r2.append(dateStr);
+                //System.out.println(r2.toString());
+                // AAAAAAAAAAAAAAAAA
                 r2 = new StringBuffer();
                 r2.append("         ");// block field
                 r2.append("      "); // trx field
@@ -144,6 +170,17 @@ public class Addresses {
             r2.append("         ");
 
         }
+    }
+
+    long dbWriteStart = 0;
+    long dbWriteFinish = 0;
+    public String dbWrite(String addr) {
+        String result = "dbWrite not set";
+        dbWriteStart = System.nanoTime();
+        result = db_instert_addr(addr);
+        dbWriteFinish  = System.nanoTime();
+        System.out.println("db write durration "+(dbWriteFinish-dbWriteStart));
+        return result;
     }
 
 

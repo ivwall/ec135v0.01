@@ -232,3 +232,76 @@ max_allowed_packet      = 16M
 
 [isamchk]
 key_buffer              = 16M
+
+
+
+https://stackoverflow.com/questions/32087233/how-does-mysql-handle-concurrent-inserts/32288484
+
+MySQL does support parallel data inserts into the same table.
+But approaches for concurrent read/write depends upon storage engine you use.
+
+InnoDB
+MySQL uses row-level locking for InnoDB tables to support simultaneous write access by multiple sessions, making them suitable for multi-user, highly concurrent, and OLTP applications.
+
+MyISAM
+MySQL uses table-level locking for MyISAM, MEMORY, and MERGE tables, allowing only one session to update those tables at a time, making them more suitable for read-only, read-mostly, or single-user applications
+
+But, the above mentioned behavior of MyISAM tables can be altered by concurrent_insert system variable in order to achieve concurrent write. Kindly refer to this link for details.
+
+Hence, as a matter of fact, MySQL does support concurrent insert for InnoDB and MyISAM storage engine.
+
+
+MariaDB [(none)]> select table_name, engine from information_schema.tables where table_schema = 'silkpurse';
++------------+--------+
+| table_name | engine |
++------------+--------+
+| wallet     | InnoDB |
++------------+--------+
+1 row in set (0.001 sec)
+
+
+
+mariadb> show table status\8G
+
+
+
+MariaDB [(none)]> select @@innodb_buffer_pool_size;
++---------------------------+
+| @@innodb_buffer_pool_size |
++---------------------------+
+|                 134217728 |
++---------------------------+
+1 row in set (0.001 sec)
+
+
+
+
+MariaDB [(none)]> use silkpurse
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [silkpurse]> show table status\G
+*************************** 1. row ***************************
+            Name: wallet
+          Engine: InnoDB
+         Version: 10
+      Row_format: Dynamic
+            Rows: 3738909
+  Avg_row_length: 113
+     Data_length: 425590784
+ Max_data_length: 0
+    Index_length: 616562688
+       Data_free: 5242880
+  Auto_increment: 8595970
+     Create_time: 2022-09-23 00:33:36
+     Update_time: 2022-09-24 00:00:22
+      Check_time: NULL
+       Collation: utf8mb4_general_ci
+        Checksum: NULL
+  Create_options: 
+         Comment: 
+Max_index_length: 0
+       Temporary: N
+1 row in set (0.000 sec)
+

@@ -13,4 +13,6 @@ public class Constants {
     public static String db_user_prop_name = "db.user";
     public static String db_pw_prop_name = "db.password";
 
+    public static String address_count = "select count(*) from wallet";
+
 }

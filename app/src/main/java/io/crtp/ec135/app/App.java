@@ -22,12 +22,11 @@ public class App {
         String result = join(tokens);
         System.out.println(WordUtils.capitalize(result));
 
-        BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
-        //bitcoinRPCs.getBlockCount();
+        //BitcoinRPCs bitcoinRPCs = new BitcoinRPCs();
+        //MariaDB db = new MariaDB();
+        //Addresses address = new Addresses(db, bitcoinRPCs);
 
-        MariaDB db = new MariaDB();
-
-        Addresses address = new Addresses(db, bitcoinRPCs);
+        Addresses address = new Addresses(new MariaDB(), new BitcoinRPCs());
         address.scan01();
     }
 }
