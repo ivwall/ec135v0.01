@@ -34,7 +34,8 @@ public class BitcoinRPCs implements IBitcoinRPC {
     public BitcoinRPCs() {
     }
 
-	private JSONObject invokeRPC2(String id, String method, List<Object> params) {
+	
+    private JSONObject invokeRPC2(String id, String method, List<Object> params) {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 
 		JSONObject json = new JSONObject();
@@ -45,13 +46,16 @@ public class BitcoinRPCs implements IBitcoinRPC {
 		}
 		JSONObject responseJsonObj = null;
 		try {
-			//httpclient.getCredentialsProvider().setCredentials(new AuthScope(nodeIP, 8332),
-			//		new UsernamePasswordCredentials(user, pw));
+
 			httpclient.getCredentialsProvider().setCredentials(new AuthScope("10.10.89.92", 8332),
 					new UsernamePasswordCredentials("Anch0rCh@1n", "abc1234"));
+
 			StringEntity myEntity = new StringEntity(json.toJSONString());
+
 			//HttpPost httppost = new HttpPost(nodeURL);
+
 			HttpPost httppost = new HttpPost("http://10.10.89.92:8332");
+
 			httppost.setEntity(myEntity);
 
 			HttpResponse response = httpclient.execute(httppost);
@@ -85,6 +89,7 @@ public class BitcoinRPCs implements IBitcoinRPC {
 		return responseJsonObj;
 	}
 
+    
     public void getBlockCount(){
         System.out.println("BitcoinRPCs.getBlockcont");
 		try {
@@ -100,6 +105,7 @@ public class BitcoinRPCs implements IBitcoinRPC {
 		}
     }
 	
+
     public String getBlockHash(int blockHeight){
 		String result = "not set";
 		try {
@@ -135,28 +141,8 @@ public class BitcoinRPCs implements IBitcoinRPC {
 		System.out.println();
 		System.out.println();
     }   
-
-
-    /*****
-	public void getBlock2(){
-        System.out.println("BitcoinPRCs.getBlock2(hash, 2)");
-		try {
-			Collection<Object> list = new LinkedList<Object>();
-			list.add("0000000099c744455f58e6c6e98b671e1bf7f37346bfd4cf5d0274ad8ee660cb");
-			list.add(2);
-
-			JSONObject json = invokeRPC2( UUID.randomUUID().toString(),
-										"getblock",	
-										(LinkedList)list );
-
- 			System.out.println(" callResult = " + json.toString() );
-
-		} catch( Exception ex) {
-			System.out.println(ex.toString());
-		}
-	}
-     */
 	
+
     /*
      * getblock
 	 * TODO describe verbosity
@@ -178,5 +164,4 @@ public class BitcoinRPCs implements IBitcoinRPC {
 		}
 		return result;
 	}
-
 }

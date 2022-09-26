@@ -29,7 +29,7 @@ public class EC135Properties {
     }
 
     public static EC135Properties getInstance() {
-        System.out.println("JWalkProperties ...");
+        //System.out.println("JWalkProperties ...");
         if (ec135Properties == null ) {
             ec135Properties = new EC135Properties();
         }

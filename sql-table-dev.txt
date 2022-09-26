@@ -305,3 +305,55 @@ Max_index_length: 0
        Temporary: N
 1 row in set (0.000 sec)
 
+
+
+
+MariaDB [(none)]> show variables like 'innodb_buffer_pool_size';
++-------------------------+------------+
+| Variable_name           | Value      |
++-------------------------+------------+
+| innodb_buffer_pool_size | 5368709120 |
++-------------------------+------------+
+1 row in set (0.002 sec)
+
+MariaDB [(none)]> show variables like 'innodb_buffer_pool_size';
+ERROR 2006 (HY000): Server has gone away
+No connection. Trying to reconnect...
+Connection id:    31
+Current database: *** NONE ***
+
++-------------------------+-----------+
+| Variable_name           | Value     |
++-------------------------+-----------+
+| innodb_buffer_pool_size | 134217728 |
++-------------------------+-----------+
+1 row in set (0.002 sec)
+
+https://dev.mysql.com/doc/refman/8.0/en/innodb-buffer-pool-resize.html
+
+mysql> SELECT @@innodb_buffer_pool_size;
++---------------------------+
+| @@innodb_buffer_pool_size |
++---------------------------+
+|                2147483648 |
++---------------------------+
+
+mysql> SELECT @@innodb_buffer_pool_instances;
++--------------------------------+
+| @@innodb_buffer_pool_instances |
++--------------------------------+
+|                              4 |
++--------------------------------+
+
+# Chunk size was set to 1GB (1073741824 bytes) on startup but was
+# truncated to innodb_buffer_pool_size / innodb_buffer_pool_instances
+
+mysql> SELECT @@innodb_buffer_pool_chunk_size;
++---------------------------------+
+| @@innodb_buffer_pool_chunk_size |
++---------------------------------+
+|                       536870912 |
++---------------------------------+
+
+
+mysql> SET GLOBAL innodb_buffer_pool_size=402653184;
