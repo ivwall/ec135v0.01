@@ -19,81 +19,25 @@ import java.text.SimpleDateFormat;
 import io.crtp.ec135.app.db.MariaDB;
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
 
-// https://www.arcblock.io/blog/en/post/2018/08/16/index-bitcoin
-// https://gobittest.appspot.com/Address
-//-----------------------------------
-/***
- * 
- */
-public class Addresses {
+// "implementing" Runnable forces method run to be implemented
+// so I like it better than extends
+public class ParseBlockImplmnts implements Runnable {
 
     MariaDB db = null;
     BitcoinRPCs bitcoinRPCs = null;
     private int checkNumberOfAddresses = 10000;
+    private int  blockNum = 0;
 
-    private Thread blkThreads[] = new Thread[2];
-
-
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
-
-    public Addresses(MariaDB mdb, BitcoinRPCs rpc) {
+    public ParseBlockImplmnts(Integer block, MariaDB mdb, BitcoinRPCs rpc) {
         db = mdb;
         bitcoinRPCs = rpc;
+        blockNum = block;
     }
-    
-    public void scan01() {
 
-        long last_time = System.nanoTime();
+    public void run() {
 
-
-        //int blkNum = 700000;
-        //int blkNum = 700001;
-        //int blkNum = 700002;
-        /***
-        int blkNum = 700003;
-        blkThreads[0] = new ParseBlockExtds(blkNum, db, bitcoinRPCs);
-        System.out.println("Start 1");
-        blkThreads[0].start();
-        blkThreads[0].run();
-
-        blkNum = 700004;
-        blkThreads[1] = new ParseBlockExtds(blkNum, db, bitcoinRPCs);
-        System.out.println("Start 2");
-        blkThreads[1].start();
-        blkThreads[1].run();
-         */
-
-        int[] blkNumbers = {700007,700008};
-
-        for (int t=0; t<2; t++) {
-            blkThreads[t] = new ParseBlockExtds(blkNumbers[t], db, bitcoinRPCs);
-            System.out.println("Start "+t);
-            blkThreads[t].start();
-            //blkThreads[t].run();
-        }
-
-
-
-
-
-
-        /****
-        for (int x=0; x<250000; x++){
-            //for (int x=749148; x<749151; x++){
-            //for (int x=0; x<749874; x++){
-            try {
-                parseBlockXTrxs(x);
-            } catch (Exception ex) {
-                System.out.println(ex.toString());
-            }
-        }
-         */
-
-        long time = System.nanoTime();
-        System.out.println("run time, milis "+(int)((time - last_time) / 1000000));
     }
+
 
 
     long rpcStart = 0;
@@ -204,6 +148,10 @@ public class Addresses {
         }
     }
 
+
+
+
+
     long dbWriteStart = 0;
     long dbWriteFinish = 0;
     public String dbWrite(String addr) {
@@ -216,6 +164,7 @@ public class Addresses {
     }
 
 
+
     public String db_instert_addr(String a){
         if (db.insert(a)) {
             a.concat("-n");
@@ -224,6 +173,8 @@ public class Addresses {
         }
         return a;
     }
+
+
 
     public String blockNumString(int blk) {
         String result = null;
@@ -246,6 +197,8 @@ public class Addresses {
         return result;
     }
 
+
+
     public String trxNumString(int trxN){
         String result = null;
         try {
@@ -266,6 +219,8 @@ public class Addresses {
         }
         return result;
     }
+
+
 
     public String addrString(String addr){
         StringBuffer result = new StringBuffer();
@@ -292,6 +247,7 @@ public class Addresses {
     }
 
 
+
     public String asmWork(String asm){
         String result = "not processed";
         try {
@@ -309,6 +265,8 @@ public class Addresses {
         }
         return result;
     }
+
+
 
 
     /***
@@ -356,6 +314,8 @@ public class Addresses {
     }
 
 
+
+
     /* s must be an even-length string. */
     //https://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java/140861#140861
     /***
@@ -370,5 +330,6 @@ public class Addresses {
         }
         return data;
     }
-    
+
+
 }

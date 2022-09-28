@@ -357,3 +357,18 @@ mysql> SELECT @@innodb_buffer_pool_chunk_size;
 
 
 mysql> SET GLOBAL innodb_buffer_pool_size=402653184;
+
+
+Implemented the HashSet datastructure.
+The ratio of "new" addresses to duplicates is very low.
+This makes sense, i.e. I sure don't do many btc transactions.
+HODL HODL
+So the HashSet implementation probably won't that great of an 
+impact on improving the write times since, lets say, 95% of 
+addresses will need to be written.
+
+It will be interesting to get a sense of the ratio.
+So, this will run while the threading implementation will take sometime to write.
+
+
+nohup java -Xmx16384m -jar app-all.jar > call-times.txt &

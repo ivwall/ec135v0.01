@@ -87,3 +87,7 @@ BUILD SUCCESSFUL in 2m 18s
 
  gradle build
  gradle run
+
+ ## running with more memory
+ nohup java -Xmx16384m -jar app-all.jar > duplicate-addr-writes.txt &
+

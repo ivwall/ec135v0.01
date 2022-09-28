@@ -9,7 +9,8 @@ import java.sql.ResultSet;
 import io.crtp.ec135.app.utilities.EC135Properties;
 import io.crtp.ec135.app.utilities.Constants;
 
-public class MariaDB implements IDataStore {
+//public class MariaDB implements IDataStore {
+public class MariaDB {
 
     EC135Properties props = EC135Properties.getInstance();
     Connection conn = null;
@@ -17,6 +18,7 @@ public class MariaDB implements IDataStore {
     PreparedStatement insertAddr;
     PreparedStatement addressCount;
     ResultSet rSet;
+    AddressSet inMemAddressHashSet = new AddressSet();
 
     public MariaDB() {
 
@@ -36,6 +38,7 @@ public class MariaDB implements IDataStore {
 
     }
 
+    /******
     public void write(String addr) {
         try {
             insertAddr.setString(1,addr);
@@ -45,12 +48,18 @@ public class MariaDB implements IDataStore {
             System.out.println(ex.toString());
         }
     }
+    */
 
     public boolean insert(String addr) {
         boolean result = true;
         try {
-            insertAddr.setString(1,addr);
-            insertAddr.executeUpdate();
+            if (inMemAddressHashSet.contains(addr)) {
+                result = false;
+            } else {
+                insertAddr.setString(1,addr);
+                insertAddr.executeUpdate();
+                inMemAddressHashSet.write(addr);
+            }
         } catch(Exception ex){
             if (ex.toString().contains("Duplicate")) {
                 // TODO: ... 
