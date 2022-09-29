@@ -90,19 +90,21 @@ public class BitcoinRPCs implements IBitcoinRPC {
 	}
 
     
-    public void getBlockCount(){
+    public Long getBlockCount(){
         System.out.println("BitcoinRPCs.getBlockcont");
+		Long blockcount = null;
 		try {
 			JSONObject json = invokeRPC2( UUID.randomUUID().toString(),
 										"getblockcount",	
 										null );
 
  			System.out.println("getblockcount callResult = " + json.toString() );
-			Long blockcount = (Long)json.get("result");
+			blockcount = (Long)json.get("result");
 			System.out.println(" blockcount = "+blockcount.toString() );
 		} catch( Exception ex) {
 			System.out.println(ex.toString());
 		}
+		return blockcount;
     }
 	
 

@@ -8,7 +8,7 @@ public interface IBitcoinRPC {
     /*
      * getblockcount
      */
-    void getBlockCount();
+    Long getBlockCount();
 
     /*
      * getblockhash
