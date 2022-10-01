@@ -91,3 +91,13 @@ BUILD SUCCESSFUL in 2m 18s
  ## running with more memory
  nohup java -Xmx16384m -jar app-all.jar > duplicate-addr-writes.txt &
 
+
+
+ ## java thread-cpu affinity
+ http://www.javased.com/?source_dir=Java-Thread-Affinity/src/main/java/vanilla/java/affinity/AffinityLock.java
+
+https://www.javai.net/post/202204/java-thread-affinity/
+
+https://www.javai.net/post/202204/java-thread-pool/
+
+http://www.javased.com/?post=12471496

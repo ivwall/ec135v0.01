@@ -28,7 +28,6 @@ public class MariaDB {
         String url = dburl +"user="+user+"&password="+pw;
 
         try {
-            //System.out.println(url);
             conn = DriverManager.getConnection(url);
             insertAddr = conn.prepareStatement(insertAddrSql);
             addressCount = conn.prepareStatement(Constants.address_count);
@@ -37,18 +36,6 @@ public class MariaDB {
         }
 
     }
-
-    /******
-    public void write(String addr) {
-        try {
-            insertAddr.setString(1,addr);
-            insertAddr.executeUpdate();
-        } catch(Exception ex){
-            System.out.println(addr);
-            System.out.println(ex.toString());
-        }
-    }
-    */
 
     public boolean insert(String addr) {
         boolean result = true;
@@ -82,5 +69,14 @@ public class MariaDB {
             System.out.println("getAddressCount "+ex.toString());
         }
         return result;
+    }
+
+    public void closeDBconn() {
+        try {
+
+        } catch(Exception ex) {
+            System.out.println("MariaDB.closeDBConn "+ex.toString());
+        }
+
     }
 }

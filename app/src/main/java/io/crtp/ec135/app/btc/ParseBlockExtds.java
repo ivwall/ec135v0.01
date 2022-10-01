@@ -25,20 +25,23 @@ public class ParseBlockExtds extends Thread {
     MariaDB db = null;
     BitcoinRPCs bitcoinRPCs = null;
     private int checkNumberOfAddresses = 10000;
-    private int  blockNum = 0;
+    private int blockNum = 0;
+    private int trxs_in_block = 0;
 
-    public ParseBlockExtds(Integer block, MariaDB mdb, BitcoinRPCs rpc) {
-        db = mdb;
+    //public ParseBlockExtds(Integer block, MariaDB mdb, BitcoinRPCs rpc) {
+    public ParseBlockExtds(Integer block, BitcoinRPCs rpc) {
+        db = new MariaDB();
         bitcoinRPCs = rpc;
         blockNum = block;
     }
 
     public void run() {
         try {
-            System.out.println("ParseBlockExtnds.run() "+blockNum);
+            System.out.println("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
             parseBlockXTrxs(blockNum);
+            db.closeDBconn();
         } catch(Exception ex) {
-            System.out.println("ParseBlockExtds run() error "+ex.toString());
+            System.out.println("blk:"+this.getName()+" - "+"ParseBlockExtds run() error "+ex.toString());
         }
     }
     
@@ -57,7 +60,7 @@ public class ParseBlockExtds extends Thread {
         rpcStart = System.nanoTime();
         JSONObject block = bitcoinRPCs.getBlock(bitcoinRPCs.getBlockHash(blockN),2);
         rpcFinish = System.nanoTime();
-        System.out.println("rpc call durration "+(rpcFinish-rpcStart));
+        System.out.println("blk:"+this.getName()+" - "+"rpc call durration "+(rpcFinish-rpcStart));
 
         Long mediantime = (Long)((JSONObject)block.get("result")).get("mediantime");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -66,6 +69,7 @@ public class ParseBlockExtds extends Thread {
 
         JSONArray trxs = (JSONArray)((JSONObject)block.get("result")).get("tx");
         int cnt = trxs.size();
+        trxs_in_block = cnt;
 
         r2.append(blockNumString(blockN));
 
@@ -120,7 +124,7 @@ public class ParseBlockExtds extends Thread {
                         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                         // Remove and unCOMMENT AAAAA
                         r2.append(dateStr);
-                        System.out.println(r2.toString());
+                        System.out.println("blk:"+this.getName()+" - "+r2.toString());
                         // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
                     } else {
@@ -158,7 +162,7 @@ public class ParseBlockExtds extends Thread {
         dbWriteStart = System.nanoTime();
         result = db_instert_addr(addr);
         dbWriteFinish  = System.nanoTime();
-        System.out.println("db write durration "+(dbWriteFinish-dbWriteStart));
+        System.out.println("blk:"+this.getName()+" - "+"db write durration "+(dbWriteFinish-dbWriteStart));
         return result;
     }
 
@@ -322,6 +326,10 @@ public class ParseBlockExtds extends Thread {
                                 + Character.digit(s.charAt(i+1), 16));
         }
         return data;
+    }
+
+    public int getTrxCount() {
+        return trxs_in_block;
     }
     
 }

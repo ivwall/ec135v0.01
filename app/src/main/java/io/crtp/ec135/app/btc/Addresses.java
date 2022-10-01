@@ -27,12 +27,15 @@ import io.crtp.ec135.app.rpc.BitcoinRPCs;
  */
 public class Addresses {
 
+    int number_of_block_scan_threads = 1;
+
     MariaDB db = null;
     BitcoinRPCs bitcoinRPCs = null;
     private int checkNumberOfAddresses = 10000;
 
-    private Thread blkThreads[] = new Thread[2];
+    ParseBlock parseBlock;
 
+    private Thread blkThreads[] = new Thread[ number_of_block_scan_threads ];
 
     static {
         Security.addProvider(new BouncyCastleProvider());
@@ -41,365 +44,104 @@ public class Addresses {
     public Addresses(MariaDB mdb, BitcoinRPCs rpc) {
         db = mdb;
         bitcoinRPCs = rpc;
+        parseBlock = new ParseBlock( mdb, rpc );
     }
     
     public void scan01() {
 
+        long two_second = 2000;
         long one_second = 1000;
         long half_second = 500;
         long qtr_second = 250;
+        long sleep_time = two_second;
 
         long last_time = System.nanoTime();
 
         int[] blkNumbers = {700009,700010,700011,700012,700013,700014,700015,700016};
 
-        int work_This_Block = 700028;
+        int work_This_Block = 0;
         //Long last_Block = bitcoinRPCs.getBlockCount();
         //int last_Block = 700016;
-        int last_Block = 700035;
+        int last_Block = 400000;
 
         // loops through all the blocks
-        System.out.println("+++while ( work_This_Block > last_Block ) {");
+        System.out.println("+++while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
         while ( work_This_Block < last_Block ) {
 
+            parseBlock.setBlock( work_This_Block );
+
+            if ( parseBlock.getTransactionCount() < 100 ) {
+
+                parseBlock.addressScan();
+                int number_of_trxs = parseBlock.getTransactionCount();
+                String block_time = parseBlock.getBlockTime();
+                System.out.println("block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+
+            } else {
+
+            }
+
+            work_This_Block++;
+
+            /******
             // loops through the array of threads
             System.out.println("+++for ( int threadIndex = 0; threadIndex < 2; threadIndex++ ) {");
-            for ( int threadIndex = 0; threadIndex < 2; threadIndex++ ) {
+            for ( int threadIndex = 0; threadIndex < number_of_block_scan_threads; threadIndex++ ) {
 
                 // thread doesn't exist instiate and start
                 System.out.println("+++if ( blkThreads[ threadIndex ] == null ) {");
                 if ( blkThreads[ threadIndex ] == null ) {
 
-                    blkThreads[ threadIndex ] = new ParseBlockExtds( work_This_Block, db, bitcoinRPCs );
+                    //blkThreads[ threadIndex ] = new ParseBlockExtds( work_This_Block, db, bitcoinRPCs );
+                    blkThreads[ threadIndex ] = new ParseBlockExtds( work_This_Block, bitcoinRPCs );
                     blkThreads[ threadIndex ].setName(""+work_This_Block);
                     blkThreads[ threadIndex ].start();
-                    System.out.println("+++blkThreads[ threadIndex ].start();");
+                    System.out.println("+++ "+blkThreads[ threadIndex ].getName()+" blkThreads[ threadIndex ].start();");
 
                     work_This_Block++;
 
                 // if this thread is running, runnable let it run
                 } else if ( blkThreads[ threadIndex ].getState() == Thread.State.RUNNABLE ) {
+
+                    int trx_cnt = ((ParseBlockExtds)blkThreads[ threadIndex ]).getTrxCount();
+                    System.out.println("+++ "+blkThreads[ threadIndex ].getName()+" num of trxs "+trx_cnt);
+
+                    if (trx_cnt < 100) {
+                        sleep_time = two_second;
+                    } else if (trx_cnt < 1000) {
+                        sleep_time = one_second;
+                    } else {
+                        sleep_time = half_second;
+                    }
                     
                 // if this thread is terminated, null the thread in the array, clean up via garbage collect
                 } else if ( blkThreads[ threadIndex ].getState() == Thread.State.TERMINATED ) {
 
-                    System.out.println( "+++Thread.State.TERMINATED " + blkThreads[ threadIndex ].getName() );
+                    System.out.println( "+++ "+blkThreads[ threadIndex ].getName()+" Thread.State.TERMINATED " + blkThreads[ threadIndex ].getName() );
                     blkThreads[ threadIndex ] = null;
-                    //System.gc();
 
                 } else {
                     System.out.println( 
-                        "+++thread index " + threadIndex + " btc block "+blkThreads[ threadIndex ].getName()+
+                        "+++ "+blkThreads[ threadIndex ].getName()+" thread index " + threadIndex + " btc block "+blkThreads[ threadIndex ].getName()+
                             " state "+ blkThreads[ threadIndex ].getState());
                 }
             }
+             */
 
             // give the system sometime time to 'clean up' and write addresses 
+            /***** 
             try {
                 Thread.sleep( half_second );
             } catch(Exception ex) {
                 System.out.println("+++this.wait "+ex.toString());
             }
+            */
 
         }
-
-        /****
-        for (int t=0; t<2; t++) {
-            blkThreads[t] = new ParseBlockExtds(blkNumbers[t], db, bitcoinRPCs);
-            System.out.println("Start "+t);
-            blkThreads[t].start();
-            //blkThreads[t].run();
-        }
-         */
 
         long time = System.nanoTime();
         System.out.println("+++run time, milis "+(int)((time - last_time) / 1000000));
 
     }
 
-
-    //long rpcStart = 0;
-    //long rpcFinish = 0;
-    /***
-     * 
-    public void parseBlockXTrxs(int blockN) {
-        //123456789 1234567890123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
-        //         1         2         3         4         5         6         7         8         8         0
-        //  749151, 2342, bc1qwedezsjqyx5cl56dgzajtpawwste50gl05ty0t94zw38mp9zs64s7a5k8k, 1.473742370000
-
-        StringBuffer r2 = new StringBuffer();
-
-        rpcStart = System.nanoTime();
-        JSONObject block = bitcoinRPCs.getBlock(bitcoinRPCs.getBlockHash(blockN),2);
-        rpcFinish = System.nanoTime();
-        System.out.println("rpc call durration "+(rpcFinish-rpcStart));
-
-        Long mediantime = (Long)((JSONObject)block.get("result")).get("mediantime");
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        Date date = new Date(mediantime*1000L);
-        String dateStr = ", "+sdf.format(date);
-
-        JSONArray trxs = (JSONArray)((JSONObject)block.get("result")).get("tx");
-        int cnt = trxs.size();
-
-        r2.append(blockNumString(blockN));
-
-        String trxString;
-        String addrStr;
-
-        for (int j=0; j<cnt; j++) {
-
-            JSONObject tx = (JSONObject)trxs.get(j);
-            JSONArray vout = (JSONArray)tx.get("vout");
-            int voutCnt = vout.size();
-
-            trxString = trxNumString(j+1);
-            r2.append(trxString);
-
-            for (int i=0; i<voutCnt; i++){
-
-                JSONObject utxo = (JSONObject)vout.get(i);
-                JSONObject script = (JSONObject)utxo.get("scriptPubKey");
-                JSONArray addrs = (JSONArray)script.get("addresses");
-                Double value = (Double)utxo.get("value");
-                String valueStr = String.format("%.12f",value); 
-
-                if (addrs != null) {
-
-                    int addrCnt = addrs.size();
-                    for (int k=0; k<addrCnt; k++) {
-
-                        String addr = (String)addrs.get(k);
-
-                        if (addr.contains(",")) {
-                            addr = addr.replace(',',' ');
-                            addr.trim();
-                        }
-
-                        //addr = db_instert_addr(addr);
-                        addr = dbWrite(addr);
-                        addrStr = addrString(addr);
-                        r2.append(addrStr);
-
-                    }
-                    r2.append(" "+valueStr);
-
-                } else if (addrs == null) {
-
-                    // see line 331
-                    String adr = asmWork((String)script.get("asm"));
-                    if (adr.contains("asm:") || adr.contains("not processed")) { 
-
-                        r2.append("  "+addrString(adr));                        
-
-                        // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-                        // Remove and unCOMMENT AAAAA
-                        r2.append(dateStr);
-                        System.out.println(r2.toString());
-                        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-                    } else {
-                        //adr = db_instert_addr(adr);
-                        adr = dbWrite(adr);                        
-                        r2.append("  "+addrString(adr));
-                    }
-                    r2.append("  "+addrString(adr));
-                    r2.append(" "+valueStr);
-
-                }
-
-                // AAAAAAAAAAAAAAAAAA
-                //r2.append(dateStr);
-                //System.out.println(r2.toString());
-                // AAAAAAAAAAAAAAAAA
-                r2 = new StringBuffer();
-                r2.append("         ");// block field
-                r2.append("      "); // trx field
-                dateStr = "";
-
-            }
-
-            r2 = new StringBuffer();
-            r2.append("         ");
-
-        }
-    }
-     */
-
-    /****
-    long dbWriteStart = 0;
-    long dbWriteFinish = 0;
-    public String dbWrite(String addr) {
-        String result = "dbWrite not set";
-        dbWriteStart = System.nanoTime();
-        result = db_instert_addr(addr);
-        dbWriteFinish  = System.nanoTime();
-        System.out.println("db write durration "+(dbWriteFinish-dbWriteStart));
-        return result;
-    }
-    */
-
-    /****
-    public String db_instert_addr(String a){
-        if (db.insert(a)) {
-            a.concat("-n");
-        } else {
-            a.concat("-d");
-        }
-        return a;
-    }
-     */
-
-    /****
-    public String blockNumString(int blk) {
-        String result = null;
-        try {
-            String blkString = ""+blk;
-            //                  12345678
-            String tempBuild = "        ";
-            int blkLength = blkString.length();
-            int diff = tempBuild.length() - blkLength;
-            StringBuffer buildStr = new StringBuffer();
-            for (int x=0; x<diff; x++){
-                buildStr.append(' ');
-            }
-            buildStr.append(blkString);
-            buildStr.append(',');
-            result = buildStr.toString();
-        } catch(Exception ex){
-            System.out.println(ex.toString());
-        }
-        return result;
-    }
-     */
-
-    /*****
-    public String trxNumString(int trxN){
-        String result = null;
-        try {
-            String trxStringIn = ""+trxN;
-            //                 12345
-            String buildStr = "     ";
-            int trxStringInLength = trxStringIn.length();
-            int diff = buildStr.length() - trxStringInLength;
-            StringBuffer stringBfr = new StringBuffer();
-            for (int x=0; x<diff; x++){
-                stringBfr.append(' ');
-            }
-            stringBfr.append(trxStringIn);
-            stringBfr.append(',');
-            result = stringBfr.toString();
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
-        }
-        return result;
-    }
-     */
-
-    /****
-    public String addrString(String addr){
-        StringBuffer result = new StringBuffer();
-        //              16   1         2         3         4         5         6       8  
-        //123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
-        //         1         2         3         4         5         6         7         8         8         0
-        //                                                                              72
-        //  749151, 2342, bc1qwedezsjqyx5cl56dgzajtpawwste50gl05ty0t94zw38mp9zs64s7a5k8k, 1.473742370000
-        try {
-            //56789 1234567890123456789 123456789 123456789 123456789 123456789 123456789 123456789 123456789
-            //     1         2         3         4         5         6         7         8         8         0
-            String te = "                                                               ";
-            int addrLength = addr.length();
-            int diff = te.length() - addrLength;
-            for (int x=0; x< diff; x++){
-                result.append(' ');
-            }
-            result.append(addr);
-            result.append(',');
-        } catch (Exception ex) {
-            System.out.println(ex.toString());
-        }
-        return result.toString();
-    }
-    */
-
-    /***
-    public String asmWork(String asm){
-        String result = "not processed";
-        try {
-            String[] splited = asm.split(" ");
-
-            if ( splited[1].contains("OP_CHECKSIG") ) {
-                result = addressFromPubKey(splited[0]);
-            } else {
-                System.out.println("asm: "+asm);
-                result = "asm: "+asm;
-            }
-
-        } catch ( Exception ex ){
-            result = "not processed";
-        }
-        return result;
-    }
-    */
-
-    /***
-     * 
-    public String addressFromPubKey( String a ){
-        String result = "addr not found";
-        try {
-            //System.out.println("learn me btc: https://learnmeabitcoin.com/technical/hash-function");
-            //https://gobittest.appspot.com/Address
-            byte[] iti = hexStringToByteArray(a);
-            Sha256Hash itiHash = Sha256Hash.of(iti);
-
-            MessageDigest rmdx = MessageDigest.getInstance("RipeMD160", "BC");
-            byte[] r1x = rmdx.digest(itiHash.getBytes());
-            //Converting the byte array in to HexString format
-            StringBuffer hexString = new StringBuffer();
-            for (int i = 0;i<r1x.length;i++) {
-                hexString.append(Integer.toHexString(0xFF & r1x[i]));
-            }
-
-            byte[] zero = hexStringToByteArray("00");
-            byte[] s5 = new byte[r1x.length + 1];
-            s5[0] = zero[0];
-            System.arraycopy(r1x, 0, s5, 1, r1x.length);
-            
-            Sha256Hash s5x = Sha256Hash.of(s5);
-            Sha256Hash s6x = Sha256Hash.of(s5x.getBytes());
-
-            byte[] first4of6 = new byte[4];
-            System.arraycopy(s6x.getBytes(), 0, first4of6, 0, 4);
-
-            byte[] s8 = new byte[s5.length + first4of6.length];
-
-            System.arraycopy(s5, 0, s8, 0, s5.length);
-            System.arraycopy(first4of6, 0, s8, s5.length, first4of6.length);
-
-            //7 - First four bytes of 6
-            result = Base58.encode(s8);
-        } catch(Exception ex) {
-            System.out.println("address_From_Pub_Key  "+ex.toString());
-            ex.printStackTrace();
-        }
-        return result;
-    }
-     */
-
-
-    /* s must be an even-length string. */
-    //https://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java/140861#140861
-    /***
-     * 
-    public static byte[] hexStringToByteArray(String s) {
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                                + Character.digit(s.charAt(i+1), 16));
-        }
-        return data;
-    }
-     */
-    
 }
