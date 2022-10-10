@@ -19,9 +19,14 @@ import java.text.SimpleDateFormat;
 import io.crtp.ec135.app.db.MariaDB;
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // "implementing" Runnable forces method run to be implemented
 // so I like it better than extends
 public class ParseBlock {
+
+    private static final Logger log = LoggerFactory.getLogger(ParseBlock.class);
 
     private MariaDB db = null;
     private BitcoinRPCs bitcoinRPCs = null;
@@ -42,7 +47,7 @@ public class ParseBlock {
         rpcStart = System.nanoTime();
         jsonBlock = bitcoinRPCs.getBlock( bitcoinRPCs.getBlockHash( block_number ), 2 );
         rpcFinish = System.nanoTime();
-        System.out.println("ParseBlock.setBlock rpc call durration "+(rpcFinish-rpcStart));
+        log.debug("ParseBlock.setBlock rpc call durration "+(rpcFinish-rpcStart));
 
         Long mediantime = (Long) ( (JSONObject)jsonBlock.get( "result" ) ).get( "mediantime" );
         Date date = new Date(mediantime*1000L);
@@ -146,7 +151,8 @@ public class ParseBlock {
                         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                         // Remove and unCOMMENT AAAAA
                         r2.append(dateStr);
-                        System.out.println(r2.toString());
+                        //System.out.println(r2.toString());
+                        log.debug(r2.toString());
                         // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
                     } else {
@@ -183,7 +189,7 @@ public class ParseBlock {
         dbWriteStart = System.nanoTime();
         result = db_instert_addr(addr);
         dbWriteFinish  = System.nanoTime();
-        System.out.println("db write durration "+(dbWriteFinish-dbWriteStart));
+        log.debug("db write durration "+(dbWriteFinish-dbWriteStart));
         return result;
     }
 
@@ -212,7 +218,7 @@ public class ParseBlock {
             buildStr.append(',');
             result = buildStr.toString();
         } catch(Exception ex){
-            System.out.println(ex.toString());
+            log.debug(ex.toString());
         }
         return result;
     }
@@ -233,7 +239,7 @@ public class ParseBlock {
             stringBfr.append(',');
             result = stringBfr.toString();
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            log.debug(ex.toString());
         }
         return result;
     }
@@ -257,7 +263,7 @@ public class ParseBlock {
             result.append(addr);
             result.append(',');
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            log.debug(ex.toString());
         }
         return result.toString();
     }
@@ -270,7 +276,7 @@ public class ParseBlock {
             if ( splited[1].contains("OP_CHECKSIG") ) {
                 result = addressFromPubKey(splited[0]);
             } else {
-                System.out.println("asm: "+asm);
+                log.debug("asm: "+asm);
                 result = "asm: "+asm;
             }
 
@@ -318,7 +324,7 @@ public class ParseBlock {
             //7 - First four bytes of 6
             result = Base58.encode(s8);
         } catch(Exception ex) {
-            System.out.println("address_From_Pub_Key  "+ex.toString());
+            log.debug("address_From_Pub_Key  "+ex.toString());
             ex.printStackTrace();
         }
         return result;

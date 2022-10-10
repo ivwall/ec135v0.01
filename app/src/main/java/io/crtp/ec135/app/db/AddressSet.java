@@ -9,7 +9,13 @@ import java.io.Serializable;
 
 import java.util.HashSet;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class AddressSet implements Serializable {
+
+    private static final Logger log = LoggerFactory.getLogger(AddressSet.class);
 
     private HashSet<String> addresses = null;
 
@@ -60,7 +66,7 @@ public class AddressSet implements Serializable {
         try {
             addresses.add(addr);
         } catch(Exception ex) {
-            System.out.println("AddressSet write error "+ex.toString());
+            log.debug("AddressSet write error "+ex.toString());
         }
     }
 
@@ -69,10 +75,9 @@ public class AddressSet implements Serializable {
         try {
             result = addresses.contains(addr);
         } catch (Exception ex) {
-            System.out.println("AddressSet contains error "+ex.toString());
+            log.debug("AddressSet contains error "+ex.toString());
         }
-        System.out.println("AddressSet CONTAINS "+addr+" "+result+" "+addresses.size());
+        log.debug("AddressSet CONTAINS "+addr+" "+result+" "+addresses.size());
         return result;
     }
-
 }

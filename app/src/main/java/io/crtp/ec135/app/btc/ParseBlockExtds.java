@@ -19,17 +19,12 @@ import java.text.SimpleDateFormat;
 import io.crtp.ec135.app.db.MariaDB;
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
 
-//import org.apache.logging.log4j.Logger;
-//import org.apache.logging.log4j.LogManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 // the class "inherets" run, i.e. it's not required to implement it
 public class ParseBlockExtds extends Thread {
 
-    //Logger log = LogManager.getLogger(ParseBlockExtds.class.getName());
     Logger log = LoggerFactory.getLogger(ParseBlockExtds.class);
 
     MariaDB db = null;

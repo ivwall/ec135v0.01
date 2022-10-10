@@ -9,8 +9,13 @@ import java.sql.ResultSet;
 import io.crtp.ec135.app.utilities.EC135Properties;
 import io.crtp.ec135.app.utilities.Constants;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 //public class MariaDB implements IDataStore {
 public class MariaDB {
+
+    Logger log = LoggerFactory.getLogger(MariaDB.class);
 
     EC135Properties props = EC135Properties.getInstance();
     Connection conn = null;
@@ -32,7 +37,8 @@ public class MariaDB {
             insertAddr = conn.prepareStatement(insertAddrSql);
             addressCount = conn.prepareStatement(Constants.address_count);
         } catch (Exception ex){
-            System.out.println(" >> "+ex.toString());
+            //System.out.println(" >> "+ex.toString());
+            log.debug(" >> "+ex.toString());
         }
 
     }
@@ -51,7 +57,8 @@ public class MariaDB {
             if (ex.toString().contains("Duplicate")) {
                 // TODO: ... 
             } else {
-                System.out.println(">>> "+ex.toString());
+                //System.out.println(">>> "+ex.toString());
+                log.debug(" >> "+ex.toString());
             }
             result = false;
         }
@@ -66,7 +73,8 @@ public class MariaDB {
                 result = rSet.getInt(1);
             }
         } catch(Exception ex) {
-            System.out.println("getAddressCount "+ex.toString());
+            //System.out.println("getAddressCount "+ex.toString());
+            log.debug("getAddressCount "+ex.toString());
         }
         return result;
     }
@@ -75,8 +83,8 @@ public class MariaDB {
         try {
 
         } catch(Exception ex) {
-            System.out.println("MariaDB.closeDBConn "+ex.toString());
+            //System.out.println("MariaDB.closeDBConn "+ex.toString());
+            log.debug("MariaDB.closeDBConn "+ex.toString());
         }
-
     }
 }

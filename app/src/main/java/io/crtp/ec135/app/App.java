@@ -5,20 +5,23 @@ package io.crtp.ec135.app;
 
 //import io.crtp.ec135.list.LinkedList;
 //import static io.crtp.ec135.utilities.StringUtils.join;
-//import static io.crtp.ec135.utilities.StringUtils.split;
-//import static io.crtp.ec135.app.MessageUtils.getMessage;
-//import org.apache.commons.text.WordUtils;
 
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
 import io.crtp.ec135.app.db.MariaDB;
 import io.crtp.ec135.app.btc.Addresses;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class App {
+
+    private static final Logger log = LoggerFactory.getLogger(App.class);
+
     public static void main(String[] args) {
 
-        System.out.println("Still she haunts me, phantomwise,");
-        System.out.println("Alice moving under skies,");
-        System.out.println("Never seen by waking eyes.");
+        log.debug("Still she haunts me, phantomwise,");
+        log.debug("Alice moving under skies,");
+        log.debug("Never seen by waking eyes.");
 
         Addresses address = new Addresses(new MariaDB(), new BitcoinRPCs());
         address.scan01();
@@ -26,10 +29,7 @@ public class App {
     }
 
     public void testTheTest() {
-
-        System.out.println("App.testTheTest - linking the method calls");
-
+        log.debug("App.testTheTest - linking the method calls");
     }
-
 
 }

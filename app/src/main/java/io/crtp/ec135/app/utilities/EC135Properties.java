@@ -6,7 +6,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class EC135Properties {
+
+    Logger log = LoggerFactory.getLogger(EC135Properties.class);
 
     private static EC135Properties ec135Properties = null;
     private Properties prop = new Properties();
@@ -19,9 +24,12 @@ public class EC135Properties {
             prop.load(input);
 
             // get the property value and print it out
-            System.out.println(prop.getProperty("db.url"));
-            System.out.println(prop.getProperty("db.user"));
-            System.out.println(prop.getProperty("db.password"));
+            //System.out.println(prop.getProperty("db.url"));
+            //System.out.println(prop.getProperty("db.user"));
+            //System.out.println(prop.getProperty("db.password"));
+            log.debug(prop.getProperty("db.url"));
+            log.debug(prop.getProperty("db.user"));
+            log.debug(prop.getProperty("db.password"));
 
         } catch (IOException ex) {
             ex.printStackTrace();
