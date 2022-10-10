@@ -131,12 +131,17 @@ https://stackoverflow.com/questions/59178076/how-to-set-slf4j-in-intellij-with-g
 
 
 
+### new lines in github readme.md
+space bar, space bar, enter
+
+### spaces 
+
 ## how to get to 600 / sec?
 
 
 Data flow characteristic number 1.
 The first few thousand blocks have under 600 trxs per block.
-
+<pre>
 +-------------+  
 |  RPC Calls  |  
 |  get block  |  
@@ -150,7 +155,7 @@ The first few thousand blocks have under 600 trxs per block.
 +-------------+
 | db instert  |
 +-------------+   
-
+</pre>
 
 Sometime later, date unknown at this time, blocks hold 1000s of trxs.
 
