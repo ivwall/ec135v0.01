@@ -131,3 +131,28 @@ https://stackoverflow.com/questions/59178076/how-to-set-slf4j-in-intellij-with-g
 
 
 
+## how to get to 600 / sec?
+
+
+Data flow characteristic number 1.
+The first few thousand blocks have under 600 trxs per block.
+
++-------------+
+|  RPC Calls  |
+|  get block  |
++-------------+
+
++-------------+
+| parse out   |
+| trxs        |
++-------------+
+
++-------------+
+| db instert  |
++-------------+   
+
+
+Sometime later, date unknown at this time, blocks hold 1000s of trxs.
+
+
+
