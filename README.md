@@ -137,10 +137,10 @@ https://stackoverflow.com/questions/59178076/how-to-set-slf4j-in-intellij-with-g
 Data flow characteristic number 1.
 The first few thousand blocks have under 600 trxs per block.
 
-+-------------+
-|  RPC Calls  |
-|  get block  |
-+-------------+
++-------------+  
+|  RPC Calls  |  
+|  get block  |  
++-------------+  
 
 +-------------+
 | parse out   |
