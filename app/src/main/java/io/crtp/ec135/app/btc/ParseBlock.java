@@ -36,7 +36,7 @@ public class ParseBlock {
         bitcoinRPCs = rpc;
     }
 
-    public void setBlock(int num){
+    public void setBlock( int num ){
 
         block_number = num;
         rpcStart = System.nanoTime();

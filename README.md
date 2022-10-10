@@ -101,3 +101,33 @@ https://www.javai.net/post/202204/java-thread-affinity/
 https://www.javai.net/post/202204/java-thread-pool/
 
 http://www.javased.com/?post=12471496
+
+
+## performace goal - 50 Million Address writes per day
+50,000,000    / 24 hours
+ 2,083,333.33 /  1 hour
+    34,722.22 /  1 min
+       578.70 /  1 sec
+
+
+
+
+## logging
+http://makble.com/gradle-slf4j-integration-example-with-eclipse
+
+https://github.com/smithlamar/java-logging-slf4j-demo
+
+https://www.slf4j.org/manual.html
+
+https://sematext.com/blog/slf4j-tutorial/
+
+https://www.quickprogrammingtips.com/spring-boot/using-log4j2-with-spring-boot.html
+
+https://www.slf4j.org/manual.html
+
+https://docs.gradle.org/current/userguide/build_lifecycle.html
+
+https://stackoverflow.com/questions/59178076/how-to-set-slf4j-in-intellij-with-gradle
+
+
+

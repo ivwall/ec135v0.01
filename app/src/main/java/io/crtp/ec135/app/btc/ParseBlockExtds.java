@@ -19,8 +19,18 @@ import java.text.SimpleDateFormat;
 import io.crtp.ec135.app.db.MariaDB;
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
 
+//import org.apache.logging.log4j.Logger;
+//import org.apache.logging.log4j.LogManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 // the class "inherets" run, i.e. it's not required to implement it
 public class ParseBlockExtds extends Thread {
+
+    //Logger log = LogManager.getLogger(ParseBlockExtds.class.getName());
+    Logger log = LoggerFactory.getLogger(ParseBlockExtds.class);
 
     MariaDB db = null;
     BitcoinRPCs bitcoinRPCs = null;
@@ -37,7 +47,8 @@ public class ParseBlockExtds extends Thread {
 
     public void run() {
         try {
-            System.out.println("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
+            //System.out.println("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
+            log.debug("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
             parseBlockXTrxs(blockNum);
             db.closeDBconn();
         } catch(Exception ex) {

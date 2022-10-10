@@ -19,6 +19,9 @@ import java.text.SimpleDateFormat;
 import io.crtp.ec135.app.db.MariaDB;
 import io.crtp.ec135.app.rpc.BitcoinRPCs;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 // https://www.arcblock.io/blog/en/post/2018/08/16/index-bitcoin
 // https://gobittest.appspot.com/Address
 //-----------------------------------
@@ -27,12 +30,19 @@ import io.crtp.ec135.app.rpc.BitcoinRPCs;
  */
 public class Addresses {
 
+    //Logger log = LogManager.getLogger(Addresses.class.getName());
+    private static final  Logger log = LoggerFactory.getLogger(Addresses.class);
+
+
     int number_of_block_scan_threads = 1;
 
     MariaDB db = null;
     BitcoinRPCs bitcoinRPCs = null;
     private int checkNumberOfAddresses = 10000;
 
+    // the very early blocks held only one address
+    // instantiating a new class for one address is not efficient
+    // maybe it's not efficient for blocks with 3000 plus addresses
     ParseBlock parseBlock;
 
     private Thread blkThreads[] = new Thread[ number_of_block_scan_threads ];
@@ -49,6 +59,9 @@ public class Addresses {
     
     public void scan01() {
 
+        System.out.println("start Addresses.scan01()");
+        log.debug("start Addresses.scan01()");
+
         long two_second = 2000;
         long one_second = 1000;
         long half_second = 500;
@@ -64,8 +77,12 @@ public class Addresses {
         //int last_Block = 700016;
         int last_Block = 400000;
 
+        int number_of_trxs = 0;
+        String block_time = "not set";
+
         // loops through all the blocks
         System.out.println("+++while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
+        log.debug("+++while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
         while ( work_This_Block < last_Block ) {
 
             parseBlock.setBlock( work_This_Block );
@@ -73,11 +90,16 @@ public class Addresses {
             if ( parseBlock.getTransactionCount() < 100 ) {
 
                 parseBlock.addressScan();
-                int number_of_trxs = parseBlock.getTransactionCount();
-                String block_time = parseBlock.getBlockTime();
-                System.out.println("block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+                number_of_trxs = parseBlock.getTransactionCount();
+                block_time = parseBlock.getBlockTime();
+                System.out.println("--- block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+                log.debug("--- block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
 
             } else {
+
+                System.out.println("+++ block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+                log.debug("+++ block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+                System.exit(0);
 
             }
 
