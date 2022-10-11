@@ -47,7 +47,7 @@ public class ParseBlock {
         rpcStart = System.nanoTime();
         jsonBlock = bitcoinRPCs.getBlock( bitcoinRPCs.getBlockHash( block_number ), 2 );
         rpcFinish = System.nanoTime();
-        log.debug("ParseBlock.setBlock rpc call durration "+(rpcFinish-rpcStart));
+        log.debug("ParseBlock.setBlock rpc call durration "+((float)(rpcFinish-rpcStart) / 1_000_000_000.00 ));
 
         Long mediantime = (Long) ( (JSONObject)jsonBlock.get( "result" ) ).get( "mediantime" );
         Date date = new Date(mediantime*1000L);
@@ -109,8 +109,8 @@ public class ParseBlock {
             JSONArray vout = (JSONArray)tx.get("vout");
             int voutCnt = vout.size();
 
-            trxString = trxNumString(j+1);
-            r2.append(trxString);
+            trxString = trxNumString( j+1 );
+            r2.append( trxString );
 
             for (int i=0; i<voutCnt; i++){
 
@@ -189,7 +189,7 @@ public class ParseBlock {
         dbWriteStart = System.nanoTime();
         result = db_instert_addr(addr);
         dbWriteFinish  = System.nanoTime();
-        log.debug("db write durration "+(dbWriteFinish-dbWriteStart));
+        log.debug("db write durration "+((float)( dbWriteFinish - dbWriteStart ) / 1_000_000_000.00 ));
         return result;
     }
 

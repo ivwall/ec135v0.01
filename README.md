@@ -134,10 +134,20 @@ https://stackoverflow.com/questions/59178076/how-to-set-slf4j-in-intellij-with-g
 ### new lines in github readme.md
 space bar, space bar, enter
 
-### spaces 
+### spaces
+
+### mariadb connetions
+[mariadb]> select @@global.max_connections
+
+151 -- is the current setting
+
+[mariadb]> show status like 'Conn%';
+[mariadb]> show status like '%onn%';
+
 
 ## how to get to 600 / sec?
 
+### block 51728 has 279 trxs
 
 Data flow characteristic number 1.
 The first few thousand blocks have under 600 trxs per block.
@@ -159,5 +169,21 @@ The first few thousand blocks have under 600 trxs per block.
 
 Sometime later, date unknown at this time, blocks hold 1000s of trxs.
 
+date/time     trx            duration
+10101630                     dd hh mn sec  --- basically started at 4:30
+             50,000          00:00:07:30
+            100,000 addr     00:00:15:55
+
+400,000 / hour * 24 hours = 960_000 / day ... 400 days
+
+10101907
+            ~96,799 add     00:00:15:00
+
+10101925     97,561         00:00:15:00
+    but something isn't correct 
+
+10101950     94,318         00:00:15:00
+
+19192995     57,862         00:00:15:00
 
 

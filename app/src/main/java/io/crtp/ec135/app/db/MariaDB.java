@@ -37,8 +37,7 @@ public class MariaDB {
             insertAddr = conn.prepareStatement(insertAddrSql);
             addressCount = conn.prepareStatement(Constants.address_count);
         } catch (Exception ex){
-            //System.out.println(" >> "+ex.toString());
-            log.debug(" >> "+ex.toString());
+            log.debug(" "+ex.toString());
         }
 
     }
@@ -57,8 +56,7 @@ public class MariaDB {
             if (ex.toString().contains("Duplicate")) {
                 // TODO: ... 
             } else {
-                //System.out.println(">>> "+ex.toString());
-                log.debug(" >> "+ex.toString());
+                log.debug(" "+ex.toString());
             }
             result = false;
         }
@@ -73,7 +71,6 @@ public class MariaDB {
                 result = rSet.getInt(1);
             }
         } catch(Exception ex) {
-            //System.out.println("getAddressCount "+ex.toString());
             log.debug("getAddressCount "+ex.toString());
         }
         return result;
@@ -83,7 +80,6 @@ public class MariaDB {
         try {
 
         } catch(Exception ex) {
-            //System.out.println("MariaDB.closeDBConn "+ex.toString());
             log.debug("MariaDB.closeDBConn "+ex.toString());
         }
     }

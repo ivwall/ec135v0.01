@@ -35,6 +35,38 @@ public class Addresses {
     int number_of_block_scan_threads = 1;
 
     MariaDB db = null;
+    MariaDB db00 = new MariaDB();
+    MariaDB db01 = new MariaDB();
+    MariaDB db02 = new MariaDB();
+    MariaDB db03 = new MariaDB();
+    MariaDB db04 = new MariaDB();
+    MariaDB db05 = new MariaDB();
+    MariaDB db06 = new MariaDB();
+    MariaDB db07 = new MariaDB();
+
+    ParseBlockExtdsThreadNoDBClose pbetndbc00 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc01 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc02 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc03 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc04 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc05 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc06 = null;
+    ParseBlockExtdsThreadNoDBClose pbetndbc07 = null;
+
+    /****
+    ParseBlockExtdsThreadNoDBClose[] parseNoDBClose = { pbetndbc00, 
+                                                        pbetndbc01, 
+                                                        pbetndbc02, 
+                                                        pbetndbc03, 
+                                                        pbetndbc04, 
+                                                        pbetndbc05, 
+                                                        pbetndbc06, 
+                                                        pbetndbc07  };
+    */
+
+    ParseBlockExtdsThreadNoDBClose[] parseNoDBCloseArray;
+    int numOfScanners = 16;
+    
     BitcoinRPCs bitcoinRPCs = null;
     private int checkNumberOfAddresses = 10000;
 
@@ -50,9 +82,27 @@ public class Addresses {
     }
 
     public Addresses(MariaDB mdb, BitcoinRPCs rpc) {
+
         db = mdb;
         bitcoinRPCs = rpc;
         parseBlock = new ParseBlock( mdb, rpc );
+
+        /***
+        parseNoDBClose[0] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[1] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[2] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[3] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[4] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[5] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[6] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+        parseNoDBClose[7] = new ParseBlockExtdsThreadNoDBClose(new MariaDB(), rpc);
+         */
+
+        parseNoDBCloseArray = new ParseBlockExtdsThreadNoDBClose[ numOfScanners ];
+
+        for (int x=0; x<numOfScanners; x++) {
+            parseNoDBCloseArray[ x ] = new ParseBlockExtdsThreadNoDBClose( new MariaDB(), rpc );
+        }
     }
     
     public void scan01() {
@@ -77,27 +127,50 @@ public class Addresses {
         int number_of_trxs = 0;
         String block_time = "not set";
 
+        int pNDBCIndex = 0;
+
         // loops through all the blocks
-        log.debug("+++while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
+        log.debug("while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
         while ( work_This_Block < last_Block ) {
 
+            /****
+            parseNoDBClose[ pNDBCIndex ].setBlock( work_This_Block );
+            parseNoDBClose[ pNDBCIndex ].run();
+             */
+ 
+            parseNoDBCloseArray[ pNDBCIndex ].setBlock( work_This_Block );
+            parseNoDBCloseArray[ pNDBCIndex ].run();
+
+            if( pNDBCIndex == parseNoDBCloseArray.length - 1 ) {
+                pNDBCIndex = 0;
+            } else {
+                pNDBCIndex++;
+            }
+
+            work_This_Block++;
+
+            /***
             parseBlock.setBlock( work_This_Block );
 
-            if ( parseBlock.getTransactionCount() < 100 ) {
+            if ( parseBlock.getTransactionCount() < 1000 ) {
 
                 parseBlock.addressScan();
                 number_of_trxs = parseBlock.getTransactionCount();
                 block_time = parseBlock.getBlockTime();
-                log.debug("--- block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+                log.debug("block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
 
             } else {
 
-                log.debug("+++ block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs);
+                parseBlock.addressScan();
+                number_of_trxs = parseBlock.getTransactionCount();
+                block_time = parseBlock.getBlockTime();
+                log.debug("block "+work_This_Block+", time "+block_time+", trx "+number_of_trxs+" system.exit");
                 System.exit(0);
 
             }
+             */
 
-            work_This_Block++;
+            //work_This_Block++;
 
             /******
             // loops through the array of threads
@@ -152,10 +225,9 @@ public class Addresses {
                 System.out.println("+++this.wait "+ex.toString());
             }
             */
-
         }
 
         long time = System.nanoTime();
-        log.debug("+++run time, milis "+(int)((time - last_time) / 1000000));
+        log.debug("run time, milis "+(int)((time - last_time) / 1000000));
     }
 }

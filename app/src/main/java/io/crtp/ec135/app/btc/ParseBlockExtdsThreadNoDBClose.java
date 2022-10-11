@@ -22,37 +22,37 @@ import io.crtp.ec135.app.rpc.BitcoinRPCs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// the class "inherets" run, i.e. it's not required to implement it
-public class ParseBlockExtds extends Thread {
+// the class "inherets" run, it's not required to implement it
+public class ParseBlockExtdsThreadNoDBClose extends Thread {
 
     Logger log = LoggerFactory.getLogger(ParseBlockExtds.class);
 
     MariaDB db = null;
     BitcoinRPCs bitcoinRPCs = null;
     private int checkNumberOfAddresses = 10000;
-    private int blockNum = 0;
+    private int blockNum = -1;
     private int trxs_in_block = 0;
 
-    public ParseBlockExtds(Integer block, MariaDB mdb, BitcoinRPCs rpc) {
-        blockNum = block;
+    public ParseBlockExtdsThreadNoDBClose( MariaDB mdb, BitcoinRPCs rpc) {
         db = mdb;
         bitcoinRPCs = rpc;
     }
-    
-    public ParseBlockExtds(Integer block, BitcoinRPCs rpc) {
-        db = new MariaDB();
-        bitcoinRPCs = rpc;
-        blockNum = block;
+
+    public void setBlock(Integer b){
+        blockNum = b;
     }
 
     public void run() {
         try {
-            //System.out.println("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
-            log.debug("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
-            parseBlockXTrxs(blockNum);
-            db.closeDBconn();
+            if (blockNum > 0) {
+                log.debug("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
+                parseBlockXTrxs(blockNum);
+                //db.closeDBconn();    
+            } else {
+                log.debug("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
+            }
         } catch(Exception ex) {
-            System.out.println("blk:"+this.getName()+" - "+"ParseBlockExtds run() error "+ex.toString());
+            log.debug("blk:"+this.getName()+" - "+"ParseBlockExtds run() error "+ex.toString());
         }
     }
     
@@ -71,7 +71,7 @@ public class ParseBlockExtds extends Thread {
         rpcStart = System.nanoTime();
         JSONObject block = bitcoinRPCs.getBlock(bitcoinRPCs.getBlockHash(blockN),2);
         rpcFinish = System.nanoTime();
-        System.out.println("blk:"+this.getName()+" - "+"rpc call durration "+(rpcFinish-rpcStart));
+        log.debug("blk:"+this.getName()+" - "+"rpc call durration "+(rpcFinish-rpcStart));
 
         Long mediantime = (Long)((JSONObject)block.get("result")).get("mediantime");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -116,7 +116,6 @@ public class ParseBlockExtds extends Thread {
                             addr.trim();
                         }
 
-                        //addr = db_instert_addr(addr);
                         addr = dbWrite(addr);
                         addrStr = addrString(addr);
                         r2.append(addrStr);
@@ -135,7 +134,7 @@ public class ParseBlockExtds extends Thread {
                         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                         // Remove and unCOMMENT AAAAA
                         r2.append(dateStr);
-                        System.out.println("blk:"+this.getName()+" - "+r2.toString());
+                        log.debug("blk:"+this.getName()+" - "+r2.toString());
                         // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
                     } else {
@@ -173,7 +172,7 @@ public class ParseBlockExtds extends Thread {
         dbWriteStart = System.nanoTime();
         result = db_instert_addr(addr);
         dbWriteFinish  = System.nanoTime();
-        System.out.println("blk:"+this.getName()+" - "+"db write durration "+(dbWriteFinish-dbWriteStart));
+        log.debug("blk:"+this.getName()+" db write time "+((float)(dbWriteFinish-dbWriteStart) / 1_000_000_000.00 ));
         return result;
     }
 
@@ -204,7 +203,7 @@ public class ParseBlockExtds extends Thread {
             buildStr.append(',');
             result = buildStr.toString();
         } catch(Exception ex){
-            System.out.println(ex.toString());
+            log.debug(ex.toString());
         }
         return result;
     }
@@ -226,7 +225,7 @@ public class ParseBlockExtds extends Thread {
             stringBfr.append(',');
             result = stringBfr.toString();
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            log.debug(ex.toString());
         }
         return result;
     }
@@ -251,11 +250,10 @@ public class ParseBlockExtds extends Thread {
             result.append(addr);
             result.append(',');
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            log.debug(ex.toString());
         }
         return result.toString();
     }
-
 
 
     public String asmWork(String asm){
@@ -266,7 +264,7 @@ public class ParseBlockExtds extends Thread {
             if ( splited[1].contains("OP_CHECKSIG") ) {
                 result = addressFromPubKey(splited[0]);
             } else {
-                System.out.println("asm: "+asm);
+                log.debug("asm: "+asm);
                 result = "asm: "+asm;
             }
 
@@ -275,8 +273,6 @@ public class ParseBlockExtds extends Thread {
         }
         return result;
     }
-
-
 
     /***
      * 
@@ -316,13 +312,11 @@ public class ParseBlockExtds extends Thread {
             //7 - First four bytes of 6
             result = Base58.encode(s8);
         } catch(Exception ex) {
-            System.out.println("address_From_Pub_Key  "+ex.toString());
+            log.debug("address_From_Pub_Key  "+ex.toString());
             ex.printStackTrace();
         }
         return result;
     }
-
-
 
     /* s must be an even-length string. */
     //https://stackoverflow.com/questions/140131/convert-a-string-representation-of-a-hex-dump-to-a-byte-array-using-java/140861#140861
@@ -339,8 +333,8 @@ public class ParseBlockExtds extends Thread {
         return data;
     }
 
+
     public int getTrxCount() {
         return trxs_in_block;
-    }
-    
+    }    
 }
