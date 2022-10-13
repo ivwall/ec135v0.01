@@ -107,7 +107,7 @@ public class Addresses {
     
     public void scan01() {
 
-        log.debug("start Addresses.scan01()");
+        //log.debug("start Addresses.scan01()");
 
         long two_second = 2000;
         long one_second = 1000;
@@ -130,7 +130,7 @@ public class Addresses {
         int pNDBCIndex = 0;
 
         // loops through all the blocks
-        log.debug("while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
+        //log.debug("while ( work_This_Block ("+work_This_Block+") > last_Block("+last_Block+") ) {");
         while ( work_This_Block < last_Block ) {
 
             /****
@@ -228,6 +228,6 @@ public class Addresses {
         }
 
         long time = System.nanoTime();
-        log.debug("run time, milis "+(int)((time - last_time) / 1000000));
+        //log.debug("run time, milis "+(int)((time - last_time) / 1000000));
     }
 }

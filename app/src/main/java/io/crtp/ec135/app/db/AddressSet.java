@@ -77,7 +77,9 @@ public class AddressSet implements Serializable {
         } catch (Exception ex) {
             log.debug("AddressSet contains error "+ex.toString());
         }
-        log.debug("AddressSet CONTAINS "+addr+" "+result+" "+addresses.size());
+        //log.debug("AddressSet CONTAINS "+addr+" "+result+" "+addresses.size());
+        //log.debug(""+addresses.size()+","+"\""+addr+"\"");
+        System.out.println(""+addresses.size()+","+"\""+addr+"\"");
         return result;
     }
 }

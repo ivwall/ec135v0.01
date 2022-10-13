@@ -187,3 +187,36 @@ date/time     trx            duration
 19192995     57,862         00:00:15:00
 
 
+## load table from a file
+https://mariadb.com/kb/en/how-to-quickly-insert-data-into-mariadb/
+
+## consider this db singlestore.com 
+singlestore.com formally MemSQL
+
+
+chown mysql /tmp/ < addresses file >
+chgrp mysql /tmp/ < addresses file >
+
+
+### "insert file"
+mysql --user='root' --password='the5thAdventure' silkpurse < '/tmp/1011-insert2.out'
+
+file 1011-insert2.out
+insert into wallet (addr) values (" address ");
+
+
+### will this work
+
+### db load from a file
+file via vi
+<pre>
+1," [address] "
+2," [address] "
+</pre>
+
+mariadb command
+<pre>
+MariaDB [silkpurse]> load data infile '/tmp/load-one.txt' into table wallet fields terminated by '.';
+</pre>
+
+

@@ -45,7 +45,7 @@ public class ParseBlockExtdsThreadNoDBClose extends Thread {
     public void run() {
         try {
             if (blockNum > 0) {
-                log.debug("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
+                //log.debug("blk:"+this.getName()+" - "+"ParseBlockExtnds.run() "+blockNum);
                 parseBlockXTrxs(blockNum);
                 //db.closeDBconn();    
             } else {
@@ -71,7 +71,7 @@ public class ParseBlockExtdsThreadNoDBClose extends Thread {
         rpcStart = System.nanoTime();
         JSONObject block = bitcoinRPCs.getBlock(bitcoinRPCs.getBlockHash(blockN),2);
         rpcFinish = System.nanoTime();
-        log.debug("blk:"+this.getName()+" - "+"rpc call durration "+(rpcFinish-rpcStart));
+        //log.debug("blk:"+this.getName()+" - "+"rpc call durration "+(rpcFinish-rpcStart));
 
         Long mediantime = (Long)((JSONObject)block.get("result")).get("mediantime");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -134,7 +134,7 @@ public class ParseBlockExtdsThreadNoDBClose extends Thread {
                         // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
                         // Remove and unCOMMENT AAAAA
                         r2.append(dateStr);
-                        log.debug("blk:"+this.getName()+" - "+r2.toString());
+                        //log.debug("blk:"+this.getName()+" - "+r2.toString());
                         // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
                     } else {
@@ -172,7 +172,7 @@ public class ParseBlockExtdsThreadNoDBClose extends Thread {
         dbWriteStart = System.nanoTime();
         result = db_instert_addr(addr);
         dbWriteFinish  = System.nanoTime();
-        log.debug("blk:"+this.getName()+" db write time "+((float)(dbWriteFinish-dbWriteStart) / 1_000_000_000.00 ));
+        //log.debug("blk:"+this.getName()+" db write time "+((float)(dbWriteFinish-dbWriteStart) / 1_000_000_000.00 ));
         return result;
     }
 

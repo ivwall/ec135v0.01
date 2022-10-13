@@ -48,8 +48,9 @@ public class MariaDB {
             if (inMemAddressHashSet.contains(addr)) {
                 result = false;
             } else {
-                insertAddr.setString(1,addr);
-                insertAddr.executeUpdate();
+                //insertAddr.setString(1,addr);
+                //insertAddr.executeUpdate();
+                //System.out.println("insert into wallet (addr) values (\""+addr+"\");");
                 inMemAddressHashSet.write(addr);
             }
         } catch(Exception ex){
